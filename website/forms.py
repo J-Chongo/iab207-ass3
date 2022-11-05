@@ -1,3 +1,4 @@
+
 from flask_wtf import FlaskForm
 from wtforms.fields import TextAreaField,SubmitField, StringField, PasswordField, IntegerField, SelectField, DateField, TimeField
 from wtforms.validators import InputRequired, Email, EqualTo, NumberRange, Optional
@@ -47,8 +48,16 @@ class EventForm(FlaskForm):
     status = SelectField(label='Status', choices=[("Open", "Open"), ("Unpublished", "Unpublished"),
         ("Sold Out", "Sold Out"), ("Cancelled", "Cancelled")])
     submit = SubmitField("Create now")
-    
-    # creates an event
+
+# category selection
+class CategoryFilterForm(FlaskForm):
+    category = SelectField(label='Category', choices=[("All","All"),("Classical", "Classical"), ("Rock", "Rock"),
+        ("EDM", "EDM"), ("Hip Hop", "Hip Hop"), ("Pop", "Pop"), ("Jazz", "Jazz"),
+        ("Blues", "Blues")])
+
+    submit = SubmitField("Search Category")
+
+# creates an event
 class EditEventForm(FlaskForm):
     name = StringField("Name", validators = [InputRequired()])
     description = TextAreaField("Description", validators = [InputRequired()])
@@ -64,3 +73,13 @@ class EditEventForm(FlaskForm):
         ("Sold Out", "Sold Out"), ("Cancelled", "Cancelled")])
 
     submit = SubmitField("Save Changes")
+
+# creates a comment for an event
+class CommentForm(FlaskForm):
+    comment = TextAreaField("Comment", validators=[InputRequired()])
+    submit = SubmitField("Submit")
+
+# form for creating a booking
+class BookingForm(FlaskForm):
+    ticket_qty = IntegerField("Ticket Quantity", validators=[InputRequired(), NumberRange(min=1)])
+    submit = SubmitField("Submit")

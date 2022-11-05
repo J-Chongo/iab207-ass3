@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block alert %}
+<div class="container-fluid">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-dark alert-dismissible fade show mt-3" role="alert">
+        {{message}}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+</div>
+{% endblock %}
+
+{% block heading %}
+<h1 class="fs-1 mb-3 fw-bold">Love music? You're in the right place.</h1>
+<p class="fs-5">
+    Find music events near you and enjoy it, we're sure you'll
+</p>
+{% endblock %}
+
+
+{% block content %}
+<h1 class="fs-2 mb-5 fw-bold">Explore ></h1>
+
+<form class="form form-horizontal" method="post" role="form" class="form">
+    {{ form.hidden_tag() }}
+    {{ wtf.form_errors(form, hiddens="only") }}
+    {{wtf.form_field(form.category) }}
+    {{wtf.form_field(form.submit,class="btn btn-dark w-100") }}
+</form>
+
+<div class="row g-4 row-cols-1 row-cols-sm-2 row-cols-md-3">
+    {% for event in events_list %}
+    <div class="col">
+        <a class="text-light link-info bg-info text-decoration-none" href="{{url_for('event.view', id=event.event_id)}}">
+            <div class="card bg-dark border-0 h-100">
+                <img class="card-img-top"
+                    src="{{ event.event_image }}"
+                    alt="{{ event.event_name }}" />
+                <div class="card-body">
+                    <h2 class="fs-4">{{ event.event_name }}</h2>
+                    <h2 class="fs-5">by {{ event.event_artist }}</h2>
+                    <h2 class="fs-6 text-primary">{{ event.event_status }}</h2>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

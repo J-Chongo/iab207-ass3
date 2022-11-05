@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+<!-- Alert section -->
+{% block alert %}
+<div class="container-fluid">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-dark alert-dismissible fade show mt-3" role="alert">
+        {{message}}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+</div>
+{% endblock %}
+
+<!-- Event details -->
+{% block heading %}
+
+<h1 class="fs-1 mb-3 fw-bold">{{ event.event_name }}</h1>
+Status: <strong>{{ event.event_status }}</strong> <br>
+Performed by <strong>{{ event.event_artist }}</strong><br>
+<p class="fs-5">
+    <em>{{ event.event_date }} {{ event.event_time }}</em><br>
+    Located at: <a href="" class="text-decoration-none">{{ event.event_venue }}</a> <br> <br>
+    {{ event.event_desc }}
+
+    {% if currentUsername == event.event_author %} <br>
+    <a href="{{ event.event_id }}/edit" type="button" class="btn btn-dark w-100 my-3 mb-3">
+        Edit
+    </a>
+    <a href="{{ event.event_id }}/delete" type="button" class="btn btn-danger w-100 mb-3">
+        Delete
+    </a>
+    {% endif %}
+</p>
+</div>
+<div class="col col-md-7">
+    <div>
+        <img class="img-fluid rounded mb-4 mb-md-0" src="{{ event.event_image }}" alt="" />
+    </div>
+</div>
+
+
+{% endblock %}
+
+<!-- Ticket Panel -->
+{% block content %}
+<h1 class="fs-2 mb-5 fw-bold">Buy tickets ></h1>
+<div class="row g-4 row-cols-1 row-cols-sm-2 row-cols-md-3 mb-5">
+    <div class="col">
+        <div class="card bg-dark border-0 h-100">
+            {% if event.event_status == "Open" %}
+            <div class="card-body">
+                <a class="text-light link-info bg-info text-decoration-none" href="" data-bs-toggle="modal" data-bs-target="#checkoutModal">
+                    <h2 class="fs-5">Ticket</h2>
+                    <h2 class="fs-6">Standard issue</h2>
+                    <h2 class="fs-6 text-primary">$20</h2>
+                </a>
+            </div>
+            {% else %}
+            <div class="card-body">
+                <a class="text-light bg-info text-decoration-none">
+                    <h2 class="fs-5">Ticket</h2>
+                    <h2 class="fs-6">Standard issue</h2>
+                    <h2 class="fs-6 text-danger">{{ event.event_status }}</h2>
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Booking Modal -->
+<div class="modal" tabindex="-1" id="checkoutModal" >
+    <div class="modal-dialog">
+        <div class="modal-content" style="background-color: #111016">
+            <div class="modal-header">
+                <h5 class="modal-title">Purchase</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/events/{{ event.event_id }}/booking" classa="form" method="post" role="form">
+                {{ bookingForm.hidden_tag() }}
+                {{ wtf.form_errors(bookingForm, hiddens="only") }}
+                <div class="modal-body">
+                    <div class="dropdown me-1">
+                        {{wtf.form_field(bookingForm.ticket_qty,"/events/{0}/booking".format(event.event_id))}}
+                    </div>
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
+                    {{wtf.form_field(bookingForm.submit,"/events/{0}/booking".format(event.event_id), class="btn btn-secondary")}}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Comment Section -->
+<h1 class="fs-2 mb-5 fw-bold">Comments ></h1>
+<div class="row g-4 row-cols-1">
+
+    <!-- Post a comment -->
+    <div class="col">
+        <div class="card input bg-dark border-0 h-100">
+            <div class="card-body">
+                <form action="/events/{{ event.event_id }}/comment" method="post" class="form" role="form">
+                    {{ commentForm.hidden_tag() }}
+                    {{ wtf.form_errors(commentForm, hiddens="only") }}
+                    {{wtf.form_field(commentForm.comment,"/events/{0}/comment".format(event.event_id))}}
+                    {{wtf.form_field(commentForm.submit,"/events/{0}/comment".format(event.event_id), class="btn btn-outline-warning w-100") }}
+                </form>
+            </div>
+        </div>
+        
+    </div>
+    
+    <!-- View comments -->
+    {% for comment in event.comments %}
+    <div class="col">
+        <div class="card bg-dark border-0 h-100">
+            <div class="card-body">
+                <a class="text-light bg-info text-decoration-none">
+                    <h2 class="fs-5 text-primary">{{ comment.user.username}} <span class="text-secondary">{{ comment.post_date.strftime("%d/%m/%y") }}</span> </h2>
+                    <h2 class="fs-6">{{ comment.comment_body }}</h2>
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %} 
+</div> 
+{% endblock %}
